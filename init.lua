@@ -3,6 +3,9 @@ pointlib = {
 	hud = {}
 }
 
+local show_itemstring = minetest.settings:get_bool("pointlib.show_itemstring")
+	~= false
+
 -- Check for custom hand range
 local range = minetest.registered_items[""].range or 4
 
@@ -76,19 +79,21 @@ minetest.register_on_joinplayer(function (player)
 		hud_elem_type = "text",
 		number = 0xFFFFFF,
 		alignment = 0,
-		offset = { x = 0, y = 20},
+		offset = { x = 0, y = 34},
 		text = ""
 	})
-	-- Create HUD element for node name
-	pointlib.hud.name = player:hud_add({
-		name = "pointlib:name",
-		position = {x=0.5,y=0},
-		hud_elem_type = "text",
-		number = 0xE5E5E5,
-		alignment = 0,
-		offset = { x = 0, y = 40},
-		text = ""
-	})
+	if show_itemstring then
+		-- Create HUD element for node name
+		pointlib.hud.name = player:hud_add({
+			name = "pointlib:name",
+			position = {x=0.5,y=0},
+			hud_elem_type = "text",
+			number = 0xE5E5E5,
+			alignment = 0,
+			offset = { x = 0, y = 54},
+			text = ""
+		})
+	end
 end)
 
 -- Create timer variable
