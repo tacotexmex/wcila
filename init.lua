@@ -3,6 +3,9 @@ pointlib = {
 	hud = {}
 }
 
+-- Check for custom hand range
+local range = minetest.registered_items[""].range or 4
+
 -- Check pointlib Visibility
 local function visible(node, player)
 	--To prevent a crash from unknown nodes
@@ -34,9 +37,11 @@ function pointlib.update(player)
 	-- Get player view direction
 	local dir = player:get_look_dir()
 	-- Cast a ray in this direction
-	local ray = minetest.raycast(pos, vector.add(pos,vector.multiply(dir,4)), false, true)
+	local ray = minetest.raycast(pos, vector.add(pos,vector.multiply(dir,range)), false, true)
 	-- Create variable of node name of possible outcome
-	local name
+	local name = ""
+	-- Create variable of node description of possible outcome
+	local description = ""
 	-- Step through ray
 	for pointed_thing in ray do
 		-- Create variable for nodes found in ray
@@ -50,16 +55,16 @@ function pointlib.update(player)
 		end
 	end
 	-- If both name and description, update HUD
-	if name and minetest.registered_items[name].description ~= "" then
+	if name ~= ""	and minetest.registered_items[name].description ~= "" then
 		-- Get node description
-		local description = minetest.registered_items[name].description
-		-- Update name HUD
-		player:hud_change(pointlib.hud.name, "text", name)
-		-- Update description HUD
-		player:hud_change(pointlib.hud.description, "text", description)
-		-- Return pointed node to external API function
-		return name
+		description = minetest.registered_items[name].description
 	end
+	-- Update name HUD
+	player:hud_change(pointlib.hud.name, "text", name)
+	-- Update description HUD
+	player:hud_change(pointlib.hud.description, "text", description)
+	-- Return pointed node to external API function
+	return name
 end
 
 -- Create HUD for new players
@@ -79,7 +84,7 @@ minetest.register_on_joinplayer(function (player)
 		name = "pointlib:name",
 		position = {x=0.5,y=0},
 		hud_elem_type = "text",
-		number = 0xFFFFFF,
+		number = 0xE5E5E5,
 		alignment = 0,
 		offset = { x = 0, y = 40},
 		text = ""
