@@ -62,8 +62,10 @@ function pointlib.update(player)
 		-- Get node description
 		description = minetest.registered_items[name].description
 	end
-	-- Update name HUD
-	player:hud_change(pointlib.hud.name, "text", name)
+	-- Update name HUD if setting is true
+	if show_itemstring then
+		player:hud_change(pointlib.hud.name, "text", name)
+	end
 	-- Update description HUD
 	player:hud_change(pointlib.hud.description, "text", description)
 	-- Return pointed node to external API function
