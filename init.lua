@@ -1,6 +1,9 @@
 -- Create public mod table
 pointlib = {
-	hud = {}
+	hud = {
+		itemstring = {},
+		description = {},
+	}
 }
 
 local show_itemstring = minetest.settings:get_bool("pointlib.show_itemstring")
@@ -39,43 +42,46 @@ function pointlib.update(player)
 	local pos = vector.add(player:getpos(),{x=0,y=1.625,z=0})
 	-- Get player view direction
 	local dir = player:get_look_dir()
+	-- Get player name
+	local name = player:get_player_name()
 	-- Cast a ray in this direction
 	local ray = minetest.raycast(pos, vector.add(pos,vector.multiply(dir,range)), false, true)
-	-- Create variable of node name of possible outcome
-	local name = ""
+	-- Create variable of node node of possible outcome
+	local itemstring = ""
 	-- Create variable of node description of possible outcome
 	local description = ""
 	-- Step through ray
 	for pointed_thing in ray do
 		-- Create variable for nodes found in ray
-		local name_in_ray = minetest.get_node(pointed_thing.under).name
+		local itemstring_in_ray = minetest.get_node(pointed_thing.under).name
 		-- Check if node should be ignored or not
-		if visible(name_in_ray, player) then
-			-- If so, put it in node name outcome variable
-			name = name_in_ray
+		if visible(itemstring_in_ray, player) then
+			-- If so, put it in node itemstring outcome variable
+			itemstring = itemstring_in_ray
 			-- No need to step further in ray
 			break
 		end
 	end
-	-- If both name and description, update HUD
-	if name ~= ""	and minetest.registered_items[name].description ~= "" then
+	-- If both itemstring and description, update HUD
+	if itemstring ~= ""	and minetest.registered_items[itemstring].description ~= "" then
 		-- Get node description
-		description = minetest.registered_items[name].description
+		description = minetest.registered_items[itemstring].description
 	end
-	-- Update name HUD if setting is true
+	-- Update itemstring HUD if setting is true
 	if show_itemstring then
-		player:hud_change(pointlib.hud.name, "text", name)
+		player:hud_change(pointlib.hud.itemstring[name], "text", itemstring)
 	end
 	-- Update description HUD
-	player:hud_change(pointlib.hud.description, "text", description)
+	player:hud_change(pointlib.hud.description[name], "text", description)
 	-- Return pointed node to external API function
-	return name
+	return itemstring
 end
 
 -- Create HUD for new players
 minetest.register_on_joinplayer(function (player)
+	local name = player:get_player_name()
 	-- Create HUD element for node description
-	pointlib.hud.description = player:hud_add({
+	pointlib.hud.description[name] = player:hud_add({
 		name = "pointlib:description",
 		position = {x=0.5,y=0},
 		hud_elem_type = "text",
@@ -86,7 +92,7 @@ minetest.register_on_joinplayer(function (player)
 	})
 	if show_itemstring then
 		-- Create HUD element for node name
-		pointlib.hud.name = player:hud_add({
+		pointlib.hud.itemstring[name] = player:hud_add({
 			name = "pointlib:name",
 			position = {x=0.5,y=0},
 			hud_elem_type = "text",
