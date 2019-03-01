@@ -48,6 +48,8 @@ function pointlib.update(player)
 	local ray = minetest.raycast(pos, vector.add(pos,vector.multiply(dir,range)), false, true)
 	-- Create variable of node node of possible outcome
 	local itemstring = ""
+	-- Create variable of node pos position of possible outcome
+	local item_pos = {}
 	-- Create variable of node description of possible outcome
 	local description = ""
 	-- Step through ray
@@ -58,6 +60,8 @@ function pointlib.update(player)
 		if visible(itemstring_in_ray, player) then
 			-- If so, put it in node itemstring outcome variable
 			itemstring = itemstring_in_ray
+			-- Also record
+			item_pos = pointed_thing.under
 			-- No need to step further in ray
 			break
 		end
@@ -73,8 +77,11 @@ function pointlib.update(player)
 	end
 	-- Update description HUD
 	player:hud_change(pointlib.hud.description[name], "text", description)
-	-- Return pointed node to external API function
-	return itemstring
+	-- Return pointed node itemstring and position to external API function
+	return {
+		["itemstring"] = itemstring,
+		["pos"] = item_pos,
+	}
 end
 
 -- Create HUD for new players
