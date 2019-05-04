@@ -12,7 +12,7 @@ local show_itemstring = minetest.settings:get_bool("pointlib.show_itemstring")
 -- Check for custom hand range
 local range = minetest.registered_items[""].range or 4
 
--- Check pointlib Visibility
+-- Check pointlib visibility
 local function visible(node, player)
 	--To prevent a crash from unknown nodes
 	local def = minetest.registered_items[node]
@@ -38,8 +38,18 @@ end
 
 -- Check for closest visible node in ray and update HUD accordingly
 function pointlib.update(player)
-	-- Get player position
-	local pos = vector.add(player:getpos(),{x=0,y=1.625,z=0})
+	-- Get player eyeheight
+	local eye_height = player:get_properties().eye_height or 1.625
+	-- Get player eye offset
+	local eye_offset = player:get_eye_offset()
+	-- Create eye position array, all factors considered
+	local eye_pos = {}
+	-- Somehow one eye_offset unit translates to 0.1 in eye_height unit, use that.
+	eye_pos.x = eye_offset.x * 0.1
+	eye_pos.y = eye_height + eye_offset.y * 0.1
+	eye_pos.z = eye_offset.z * 0.1
+	-- Get player (eye) position
+	local pos = vector.add(player:getpos(),eye_pos)
 	-- Get player view direction
 	local dir = player:get_look_dir()
 	-- Get player name
